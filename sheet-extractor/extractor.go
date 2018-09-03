@@ -72,7 +72,7 @@ func main() {
 		flag.PrintDefaults()
 	}
 	credentialsFile := flag.String("credentials", "", "credential file")
-	spreadsheetId := flag.String("spreadsheet", "", "google spreadsheet identifier")
+	spreadsheetID := flag.String("spreadsheet", "", "google spreadsheet identifier")
 	flag.Parse()
 
 	b, err := ioutil.ReadFile(*credentialsFile)
@@ -91,13 +91,15 @@ func main() {
 		log.Fatalf("Unable to retrieve Sheets client: %v", err)
 	}
 
-	resp, err := srv.Spreadsheets.Get(*spreadsheetId).IncludeGridData(true).Context(context.Background()).Do()
+	resp, err := srv.Spreadsheets.Get(*spreadsheetID).IncludeGridData(true).Context(context.Background()).Do()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Print all sheet title
-	for _, v := range resp.Sheets {
-		fmt.Printf("%#v\n", v.Properties.Title)
+	// Extract all player names
+	players, err := extractPlayers(resp.Sheets)
+	if err != nil {
+		log.Fatal(err)
 	}
+	fmt.Printf("%v players\n", len(players))
 }
