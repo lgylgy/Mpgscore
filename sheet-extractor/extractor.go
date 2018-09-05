@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -69,10 +70,17 @@ func saveToken(path string, token *oauth2.Token) {
 
 func main() {
 	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, ""+
+			`sheet-extractor extracts player grades from mpg googlesheet.
+The result is serialized in players.json.
+
+`)
 		flag.PrintDefaults()
 	}
-	credentialsFile := flag.String("credentials", "", "credential file")
+	credentialsFile := flag.String("credentials", "", "google authorization file")
 	spreadsheetID := flag.String("spreadsheet", "", "google spreadsheet identifier")
+	outputDir := flag.String("output", "", "output directory")
+
 	flag.Parse()
 
 	b, err := ioutil.ReadFile(*credentialsFile)
@@ -101,5 +109,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%v players\n", len(players))
+
+	// Serialize players in players
+	bytes, err := json.Marshal(players)
+	if err != nil {
+		log.Fatalf("Unable to marshal players: %v", err)
+	}
+
+	// Write output file
+	err = ioutil.WriteFile(filepath.Join(*outputDir, "players.json"), bytes, 0644)
+	if err != nil {
+		log.Fatalf("Unable to write players.json: %v", err)
+	}
 }
