@@ -3,6 +3,7 @@ package main
 import (
 	"Mpgscore/api"
 	"fmt"
+	"sync"
 
 	"google.golang.org/api/sheets/v4"
 )
@@ -95,17 +96,50 @@ func extractTeamPlayers(sheet *sheets.Sheet) ([]*api.Player, error) {
 	return players, nil
 }
 
-func extractPlayers(sheets []*sheets.Sheet) ([]*api.Player, error) {
-	players := []*api.Player{}
-	for k, v := range sheets {
-		if k >= startingSheet {
-			teamPlayers, err := extractTeamPlayers(v)
-			if err != nil {
-				return nil, err
-			}
-			fmt.Printf("    %v players extracted\n", len(teamPlayers))
-			players = append(players, teamPlayers...)
-		}
+func extractPlayers(tabs []*sheets.Sheet, jobs uint) ([]*api.Player, error) {
+
+	if len(tabs) < 2 {
+		return nil, fmt.Errorf("Invalid sheet count")
 	}
+
+	players := []*api.Player{}
+	pending := make(chan *sheets.Sheet)
+	results := make(chan []*api.Player)
+	stop := make(chan bool)
+	running := &sync.WaitGroup{}
+	running.Add(int(jobs))
+
+	tabs = tabs[1:]
+	go func() {
+	Outer:
+		for _, s := range tabs {
+			select {
+			case pending <- s:
+			case <-stop:
+				break Outer
+			}
+		}
+		close(pending)
+		running.Wait()
+		close(results)
+	}()
+
+	for i := uint(0); i < jobs; i++ {
+		go func() {
+			defer running.Done()
+			for v := range pending {
+				players, err := extractTeamPlayers(v)
+				if err != nil {
+					break
+				}
+				results <- players
+			}
+		}()
+	}
+
+	for result := range results {
+		players = append(players, result...)
+	}
+
 	return players, nil
 }

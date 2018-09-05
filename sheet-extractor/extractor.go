@@ -80,7 +80,7 @@ The result is serialized in players.json.
 	credentialsFile := flag.String("credentials", "", "google authorization file")
 	spreadsheetID := flag.String("spreadsheet", "", "google spreadsheet identifier")
 	outputDir := flag.String("output", "", "output directory")
-
+	jobs := flag.Uint("jobs", 1, "number of concurrent jobs")
 	flag.Parse()
 
 	b, err := ioutil.ReadFile(*credentialsFile)
@@ -105,7 +105,7 @@ The result is serialized in players.json.
 	}
 
 	// Extract all player names
-	players, err := extractPlayers(resp.Sheets)
+	players, err := extractPlayers(resp.Sheets, *jobs)
 	if err != nil {
 		log.Fatal(err)
 	}
