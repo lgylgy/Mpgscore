@@ -1,11 +1,11 @@
 package main
 
 import (
-	"Mpgscore/api"
 	"fmt"
 	"sync"
 
 	"google.golang.org/api/sheets/v4"
+	"mpgscore/api"
 )
 
 const (

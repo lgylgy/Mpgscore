@@ -1,5 +1,5 @@
-hash: 452777d4f5f0be33e11f1079e70e0fc088cb87476a9d7710f8931901d9553977
-updated: 2018-09-04T12:37:19.0815687+02:00
+hash: 76b7291504e913e6abc1085c8ee61228081c5ae5e4337ea17fd4dfb7e171b1de
+updated: 2018-09-12T14:29:21.2523224+02:00
 imports:
 - name: cloud.google.com/go
   version: 07eee00ee8a4df61bb7b10aa7bcc26b467abacf1
@@ -9,6 +9,12 @@ imports:
   version: b27b920f9e71b439b873b17bf99f56467623814a
   subpackages:
   - proto
+- name: github.com/gorilla/handlers
+  version: 7e0847f9db758cdebd26c149d0ae9d5d0b9c98ce
+- name: github.com/gorilla/mux
+  version: 9e1f5955c0d22b55d9e20d6faa28589f83b2faca
+- name: github.com/rs/xid
+  version: 15d26544def341f036c5f8dca987a4cbe575032c
 - name: golang.org/x/net
   version: 8a410e7b638dca158bf9e766925842f6651ff828
   subpackages:
@@ -40,4 +46,11 @@ imports:
   - internal/remote_api
   - internal/urlfetch
   - urlfetch
+- name: gopkg.in/mgo.v2
+  version: 9856a29383ce1c59f308dd1cf0363a79b5bef6b5
+  subpackages:
+  - bson
+  - internal/json
+  - internal/sasl
+  - internal/scram
 testImports: []

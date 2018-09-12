@@ -1,4 +1,4 @@
-package: Mpgscore
+package: mpgscore
 import:
 - package: golang.org/x/net
   subpackages:
