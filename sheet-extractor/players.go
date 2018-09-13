@@ -32,15 +32,6 @@ func extractMatchCount(row *sheets.RowData) int {
 	return count
 }
 
-func extractTeamName(row *sheets.RowData) string {
-	for c, data := range row.Values {
-		if c == teamCol {
-			return data.FormattedValue
-		}
-	}
-	return ""
-}
-
 func extractPlayer(row *sheets.RowData, team string, matchs int) *api.Player {
 	player := &api.Player{}
 	player.Team = team
@@ -57,36 +48,31 @@ func extractPlayer(row *sheets.RowData, team string, matchs int) *api.Player {
 	return player
 }
 
-func validMetaData(team, sheetTitle string, matchCount int) error {
+func validMetaData(team string, matchCount int) error {
 	if team == "" {
-		return fmt.Errorf("invalid name team in %v", sheetTitle)
+		return fmt.Errorf("invalid name team in %v", team)
 	}
 	if matchCount == 0 {
-		return fmt.Errorf("no match is filled in %v", sheetTitle)
+		return fmt.Errorf("no match is filled in %v", team)
 	}
 	return nil
 }
 
-func extractTeamPlayers(sheet *sheets.Sheet) ([]*api.Player, error) {
-	sheetTitle := sheet.Properties.Title
-	fmt.Printf("Extract %v sheet..\n", sheetTitle)
+func extractTeamPlayers(sheet *sheets.Sheet, teamID string) ([]*api.Player, error) {
 	if len(sheet.Data) == 0 {
-		return nil, fmt.Errorf("any data in the grid %v", sheetTitle)
+		return nil, fmt.Errorf("any data in the grid %v", teamID)
 	}
-	var team string
 	var matchCount int
 	players := []*api.Player{}
 	for r, row := range sheet.Data[0].RowData {
-		if r == teamRow {
-			team = extractTeamName(row)
-		} else if r == matchsRow {
+		if r == matchsRow {
 			matchCount = extractMatchCount(row)
 		} else if r >= startingPlayer {
-			err := validMetaData(team, sheetTitle, matchCount)
+			err := validMetaData(teamID, matchCount)
 			if err != nil {
 				return nil, err
 			}
-			player := extractPlayer(row, team, matchCount)
+			player := extractPlayer(row, teamID, matchCount)
 			if player == nil {
 				break
 			}
@@ -96,7 +82,7 @@ func extractTeamPlayers(sheet *sheets.Sheet) ([]*api.Player, error) {
 	return players, nil
 }
 
-func extractPlayers(tabs []*sheets.Sheet, jobs uint) ([]*api.Player, error) {
+func extractPlayers(tabs []*sheets.Sheet, jobs uint, team string) ([]*api.Player, error) {
 
 	if len(tabs) < 2 {
 		return nil, fmt.Errorf("Invalid sheet count")
@@ -128,11 +114,15 @@ func extractPlayers(tabs []*sheets.Sheet, jobs uint) ([]*api.Player, error) {
 		go func() {
 			defer running.Done()
 			for v := range pending {
-				players, err := extractTeamPlayers(v)
-				if err != nil {
-					break
+				title := v.Properties.Title
+				if team == "" || title == team {
+					fmt.Printf("Extract %v sheet..\n", title)
+					players, err := extractTeamPlayers(v, title)
+					if err != nil {
+						break
+					}
+					results <- players
 				}
-				results <- players
 			}
 		}()
 	}
