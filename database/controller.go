@@ -3,6 +3,7 @@ package db
 import (
 	"github.com/rs/xid"
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"mpgscore/api"
 )
 
@@ -52,6 +53,21 @@ func (c *Controller) ListPlayers() ([]*api.Player, error) {
 func (c *Controller) AddPlayer(player *api.Player) (*api.Player, error) {
 	player.ID = xid.New().String()
 	if err := c.collection.Insert(player); err != nil {
+		return nil, err
+	}
+	return player, nil
+}
+
+func (c *Controller) GetPlayer(id string) (*api.Player, error) {
+	player := &api.Player{}
+	if err := c.collection.Find(bson.D{{Name: "id", Value: id}}).One(player); err != nil {
+		return nil, err
+	}
+	return player, nil
+}
+
+func (c *Controller) UpdatePlayer(player *api.Player) (*api.Player, error) {
+	if err := c.collection.Update(bson.D{{Name: "id", Value: player.ID}}, player); err != nil {
 		return nil, err
 	}
 	return player, nil
