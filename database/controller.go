@@ -22,6 +22,18 @@ func (c *Controller) Connect(mongoAddr, database, collection string) error {
 	}
 	c.session = session
 	c.collection = session.DB(database).C(collection)
+
+	index := mgo.Index{
+		Key:        []string{"name"},
+		Unique:     true,
+		DropDups:   true,
+		Background: true,
+		Sparse:     true,
+	}
+	err = c.collection.EnsureIndex(index)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
