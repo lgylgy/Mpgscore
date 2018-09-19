@@ -35,6 +35,8 @@ func registerHandlers() {
 		Handler(handler(listPlayers))
 	routes.Methods("GET").Path("/players/{id}").
 		Handler(handler(getPlayer))
+	routes.Methods("GET").Path("/teams/{id}").
+		Handler(handler(listTeamPlayers))
 	routes.Methods("PUT").Path("/players/{id}").
 		Handler(handler(updatePlayer))
 	routes.Methods("POST").Path("/players").
@@ -59,6 +61,15 @@ func createPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgErro
 
 func listPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
 	players, err := controller.ListPlayers()
+	if err != nil {
+		return nil, mpgErrorf(err, "could not list players: %v", err)
+	}
+	return players, nil
+}
+
+func listTeamPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
+	params := mux.Vars(r)
+	players, err := controller.ListTeamPlayers(params["id"])
 	if err != nil {
 		return nil, mpgErrorf(err, "could not list players: %v", err)
 	}

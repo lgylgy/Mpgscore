@@ -50,6 +50,14 @@ func (c *Controller) ListPlayers() ([]*api.Player, error) {
 	return result, nil
 }
 
+func (c *Controller) ListTeamPlayers(team string) ([]*api.Player, error) {
+	var result []*api.Player
+	if err := c.collection.Find(bson.D{{Name: "team", Value: team}}).Sort("name").All(&result); err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (c *Controller) AddPlayer(player *api.Player) (*api.Player, error) {
 	player.ID = xid.New().String()
 	if err := c.collection.Insert(player); err != nil {
