@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: players-deployment
+spec:
+  selector:
+    matchLabels:
+      app: players
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: players
+    spec:
+      containers:
+      - image: gcr.io/mpgdb-217111/mpg-service:1.0
+        name: players-container
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http-server

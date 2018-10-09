@@ -5,27 +5,29 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"google.golang.org/appengine"
-	"mpgscore/api"
-	"mpgscore/database"
 )
 
-var controller *db.Controller
+type Player struct {
+	ID     string   `json:"id"`
+	Name   string   `json:"name"`
+	Team   string   `json:"team"`
+	Grades []string `json:"grades"`
+}
+
+var controller *Controller
 
 func main() {
-	controller = db.NewController()
-	err := controller.Connect("$MONGODB", "$DATABASE", "$COLLECTION")
+
+	controller = NewController()
+	err := controller.Connect("$MONGODB", "$MONGODB", "$MONGODB")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer controller.Close()
 
 	registerHandlers()
-	appengine.Main()
 }
 
 func registerHandlers() {
@@ -42,13 +44,13 @@ func registerHandlers() {
 	routes.Methods("POST").Path("/players").
 		Handler(handler(createPlayer))
 
-	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, routes))
+	log.Fatal(http.ListenAndServe(":8080", routes))
 }
 
 func createPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
 	defer r.Body.Close()
 
-	var player api.Player
+	var player Player
 	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
 		return nil, mpgErrorf(err, "invalid request payload: %v", err)
 	}
@@ -86,7 +88,7 @@ func getPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) 
 }
 
 func updatePlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
-	var player api.Player
+	var player Player
 	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
 		return nil, mpgErrorf(err, "invalid request payload: %v", err)
 	}

@@ -1,10 +1,12 @@
-package db
+package main
 
 import (
+	"crypto/tls"
+	"net"
+
 	"github.com/rs/xid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"mpgscore/api"
 )
 
 type Controller struct {
@@ -17,7 +19,17 @@ func NewController() *Controller {
 }
 
 func (c *Controller) Connect(mongoAddr, database, collection string) error {
-	session, err := mgo.Dial(mongoAddr)
+	dialInfo, err := mgo.ParseURL(mongoAddr)
+	if err != nil {
+		return err
+	}
+	//Below part is similar to above.
+	tlsConfig := &tls.Config{}
+	dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
+		conn, err := tls.Dial("tcp", addr.String(), tlsConfig)
+		return conn, err
+	}
+	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
 		return err
 	}
@@ -42,23 +54,23 @@ func (c *Controller) Close() {
 	c.session.Close()
 }
 
-func (c *Controller) ListPlayers() ([]*api.Player, error) {
-	var result []*api.Player
+func (c *Controller) ListPlayers() ([]*Player, error) {
+	var result []*Player
 	if err := c.collection.Find(nil).Sort("name").All(&result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func (c *Controller) ListTeamPlayers(team string) ([]*api.Player, error) {
-	var result []*api.Player
+func (c *Controller) ListTeamPlayers(team string) ([]*Player, error) {
+	var result []*Player
 	if err := c.collection.Find(bson.D{{Name: "team", Value: team}}).Sort("name").All(&result); err != nil {
 		return nil, err
 	}
 	return result, nil
 }
 
-func (c *Controller) AddPlayer(player *api.Player) (*api.Player, error) {
+func (c *Controller) AddPlayer(player *Player) (*Player, error) {
 	player.ID = xid.New().String()
 	if err := c.collection.Insert(player); err != nil {
 		return nil, err
@@ -66,15 +78,15 @@ func (c *Controller) AddPlayer(player *api.Player) (*api.Player, error) {
 	return player, nil
 }
 
-func (c *Controller) GetPlayer(id string) (*api.Player, error) {
-	player := &api.Player{}
+func (c *Controller) GetPlayer(id string) (*Player, error) {
+	player := &Player{}
 	if err := c.collection.Find(bson.D{{Name: "id", Value: id}}).One(player); err != nil {
 		return nil, err
 	}
 	return player, nil
 }
 
-func (c *Controller) UpdatePlayer(player *api.Player) (*api.Player, error) {
+func (c *Controller) UpdatePlayer(player *Player) (*Player, error) {
 	if err := c.collection.Update(bson.D{{Name: "id", Value: player.ID}}, player); err != nil {
 		return nil, err
 	}
