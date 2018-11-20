@@ -13,7 +13,7 @@ spec:
         app: players
     spec:
       containers:
-      - image: gcr.io/mpgdb-217111/mpg-service:1.0
+      - image: gcr.io/mpgdb-217111/db-service:1.0
         name: players-container
         imagePullPolicy: Always
         ports:
