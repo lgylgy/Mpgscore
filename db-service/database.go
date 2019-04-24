@@ -37,7 +37,7 @@ func (c *Controller) Connect(mongoAddr, database, collection string) error {
 	c.collection = session.DB(database).C(collection)
 
 	index := mgo.Index{
-		Key:        []string{"name"},
+		Key:        []string{"id"},
 		Unique:     true,
 		DropDups:   true,
 		Background: true,
