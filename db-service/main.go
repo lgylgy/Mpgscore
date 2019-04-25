@@ -55,11 +55,11 @@ func createPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgErro
 
 	var player Player
 	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
-		return nil, mpgErrorf(err, "invalid request payload: %v", err)
+		return nil, mpgErrorf("POST /players", err)
 	}
 	_, err := controller.AddPlayer(&player)
 	if err != nil {
-		return nil, mpgErrorf(err, "could not save player: %v", err)
+		return nil, mpgErrorf("POST /players", err)
 	}
 	return player, nil
 }
@@ -67,7 +67,7 @@ func createPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgErro
 func listPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
 	players, err := controller.ListPlayers()
 	if err != nil {
-		return nil, mpgErrorf(err, "could not list players: %v", err)
+		return nil, mpgErrorf("GET /players", err)
 	}
 	return players, nil
 }
@@ -76,7 +76,7 @@ func listTeamPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *mpgE
 	params := mux.Vars(r)
 	players, err := controller.ListTeamPlayers(params["id"])
 	if err != nil {
-		return nil, mpgErrorf(err, "could not list players: %v", err)
+		return nil, mpgErrorf("GET /teams", err)
 	}
 	return players, nil
 }
@@ -85,7 +85,7 @@ func getPlayerById(w http.ResponseWriter, r *http.Request) (interface{}, *mpgErr
 	params := mux.Vars(r)
 	player, err := controller.GetPlayerById(params["id"])
 	if err != nil {
-		return nil, mpgErrorf(err, "could not find player: %v", err)
+		return nil, mpgErrorf("GET /player", err)
 	}
 	return player, nil
 }
@@ -94,16 +94,16 @@ func getPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) 
 	query := r.URL.Query()
 	firstname := query.Get("firstname")
 	if firstname == "" {
-		return nil, mpgErrorf(errors.New("missing parameter"), "invalid request")
+		return nil, mpgErrorf("GET /player", errors.New("missing parameter"))
 	}
 	lastname := query.Get("lastname")
 	if lastname == "" {
-		return nil, mpgErrorf(errors.New("missing parameter"), "invalid request")
+		return nil, mpgErrorf("GET /player", errors.New("missing parameter"))
 	}
 
 	player, err := controller.GetPlayer(firstname, lastname)
 	if err != nil {
-		return nil, mpgErrorf(err, "could not find player: %v", err)
+		return nil, mpgErrorf("GET /player", err)
 	}
 	return player, nil
 }
@@ -111,13 +111,13 @@ func getPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) 
 func updatePlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
 	var player Player
 	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
-		return nil, mpgErrorf(err, "invalid request payload: %v", err)
+		return nil, mpgErrorf("PUT /players", err)
 	}
 	params := mux.Vars(r)
 	player.ID = params["id"]
 	updated, err := controller.UpdatePlayer(&player)
 	if err != nil {
-		return nil, mpgErrorf(err, "could not update player: %v", err)
+		return nil, mpgErrorf("PUT /players", err)
 	}
 	return updated, nil
 }
@@ -125,17 +125,16 @@ func updatePlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgErro
 type handler func(http.ResponseWriter, *http.Request) (interface{}, *mpgError)
 
 type mpgError struct {
-	Error   error
-	Message string
-	Code    int
+	Error error
+	Route string
+	Code  int
 }
 
 func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	result, e := h(w, r)
 	if e != nil {
-		log.Printf("Handler error: status code: %d, message: %s, underlying err: %#v",
-			e.Code, e.Message, e.Error)
-		http.Error(w, e.Message, e.Code)
+		log.Printf("%s %d: %s", e.Route, e.Code, e.Error.Error())
+		http.Error(w, e.Error.Error(), e.Code)
 		return
 	}
 	resultJson, err := json.Marshal(result)
@@ -149,10 +148,10 @@ func (h handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write(resultJson)
 }
 
-func mpgErrorf(err error, format string, v ...interface{}) *mpgError {
+func mpgErrorf(route string, err error) *mpgError {
 	return &mpgError{
-		Error:   err,
-		Message: fmt.Sprintf(format, v...),
-		Code:    http.StatusInternalServerError,
+		Error: err,
+		Route: route,
+		Code:  http.StatusInternalServerError,
 	}
 }
