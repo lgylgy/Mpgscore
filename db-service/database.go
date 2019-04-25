@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"net"
 
+	"fmt"
 	"github.com/rs/xid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -78,9 +79,17 @@ func (c *Controller) AddPlayer(player *Player) (*Player, error) {
 	return player, nil
 }
 
-func (c *Controller) GetPlayer(id string) (*Player, error) {
+func (c *Controller) GetPlayerById(id string) (*Player, error) {
 	player := &Player{}
 	if err := c.collection.Find(bson.D{{Name: "id", Value: id}}).One(player); err != nil {
+		return nil, err
+	}
+	return player, nil
+}
+
+func (c *Controller) GetPlayer(firstname, lastname string) (*Player, error) {
+	player := &Player{}
+	if err := c.collection.Find(bson.D{{Name: "name", Value: fmt.Sprintf("%s %s", lastname, firstname)}}).One(player); err != nil {
 		return nil, err
 	}
 	return player, nil

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -36,6 +37,8 @@ func registerHandlers() {
 	routes.Methods("GET").Path("/players").
 		Handler(handler(listPlayers))
 	routes.Methods("GET").Path("/players/{id}").
+		Handler(handler(getPlayerById))
+	routes.Methods("GET").Path("/player").
 		Handler(handler(getPlayer))
 	routes.Methods("GET").Path("/teams/{id}").
 		Handler(handler(listTeamPlayers))
@@ -78,9 +81,27 @@ func listTeamPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *mpgE
 	return players, nil
 }
 
-func getPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
+func getPlayerById(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
 	params := mux.Vars(r)
-	player, err := controller.GetPlayer(params["id"])
+	player, err := controller.GetPlayerById(params["id"])
+	if err != nil {
+		return nil, mpgErrorf(err, "could not find player: %v", err)
+	}
+	return player, nil
+}
+
+func getPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
+	query := r.URL.Query()
+	firstname := query.Get("firstname")
+	if firstname == "" {
+		return nil, mpgErrorf(errors.New("missing parameter"), "invalid request")
+	}
+	lastname := query.Get("lastname")
+	if lastname == "" {
+		return nil, mpgErrorf(errors.New("missing parameter"), "invalid request")
+	}
+
+	player, err := controller.GetPlayer(firstname, lastname)
 	if err != nil {
 		return nil, mpgErrorf(err, "could not find player: %v", err)
 	}
