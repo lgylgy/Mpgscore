@@ -27,11 +27,11 @@ func myPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) 
 	query := r.URL.Query()
 	league := query.Get("league")
 	if league == "" {
-		return nil, mpgErrorf(errors.New("league parameter is misssing"), "invalid request")
+		return nil, mpgErrorf(errors.New("missing parameter"), "invalid request")
 	}
 	key := query.Get("key")
 	if key == "" {
-		return nil, mpgErrorf(errors.New("key parameter is missing"), "invalid request")
+		return nil, mpgErrorf(errors.New("missing parameter"), "invalid request")
 	}
 	result, err := getPlayers(league, key)
 	if err != nil {

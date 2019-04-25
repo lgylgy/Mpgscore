@@ -56,7 +56,7 @@ func createPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgErro
 	}
 	_, err := controller.AddPlayer(&player)
 	if err != nil {
-		return nil, mpgErrorf(err, "could not save book: %v", err)
+		return nil, mpgErrorf(err, "could not save player: %v", err)
 	}
 	return player, nil
 }
