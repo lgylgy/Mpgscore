@@ -46,5 +46,8 @@ func getPlayers(league, key string) ([]*Player, error) {
 	if err != nil {
 		return nil, err
 	}
-	return info.Data.Players, nil
+	if info.Data != nil {
+		return info.Data.Players, nil
+	}
+	return []*Player{}, nil
 }
