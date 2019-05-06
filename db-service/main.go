@@ -93,14 +93,10 @@ func getPlayerById(w http.ResponseWriter, r *http.Request) (interface{}, *mpgErr
 func getPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *mpgError) {
 	query := r.URL.Query()
 	firstname := query.Get("firstname")
-	if firstname == "" {
-		return nil, mpgErrorf("GET /player", errors.New("missing parameter"))
-	}
 	lastname := query.Get("lastname")
-	if lastname == "" {
+	if firstname == "" && lastname == "" {
 		return nil, mpgErrorf("GET /player", errors.New("missing parameter"))
 	}
-
 	player, err := controller.GetPlayer(firstname, lastname)
 	if err != nil {
 		return nil, mpgErrorf("GET /player", err)
