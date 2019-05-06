@@ -4,23 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"mpgscore/api"
 	"net/http"
 )
 
-type Player struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-}
-
-type Data struct {
-	Players []*Player `json:"players"`
-}
-
 type PlayersInfo struct {
-	Data *Data `json:"data"`
+	Data *api.MpgData `json:"data"`
 }
 
-func getPlayers(league, key string) ([]*Player, error) {
+func getPlayers(league, key string) ([]*api.MpgPlayer, error) {
 	client := &http.Client{}
 
 	url := fmt.Sprintf("https://api.monpetitgazon.com/league/%s/coach", league)
@@ -49,5 +41,5 @@ func getPlayers(league, key string) ([]*Player, error) {
 	if info.Data != nil {
 		return info.Data.Players, nil
 	}
-	return []*Player{}, nil
+	return []*api.MpgPlayer{}, nil
 }

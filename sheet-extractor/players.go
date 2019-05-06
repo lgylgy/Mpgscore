@@ -32,8 +32,8 @@ func extractMatchCount(row *sheets.RowData) int {
 	return count
 }
 
-func extractPlayer(row *sheets.RowData, team string, matchs int) *api.Player {
-	player := &api.Player{}
+func extractPlayer(row *sheets.RowData, team string, matchs int) *api.DbPlayer {
+	player := &api.DbPlayer{}
 	player.Team = api.NormalizeString(team)
 	for c, data := range row.Values {
 		if c == nameRow {
@@ -58,12 +58,12 @@ func validMetaData(team string, matchCount int) error {
 	return nil
 }
 
-func extractTeamPlayers(sheet *sheets.Sheet, teamID string) ([]*api.Player, error) {
+func extractTeamPlayers(sheet *sheets.Sheet, teamID string) ([]*api.DbPlayer, error) {
 	if len(sheet.Data) == 0 {
 		return nil, fmt.Errorf("any data in the grid %v", teamID)
 	}
 	var matchCount int
-	players := []*api.Player{}
+	players := []*api.DbPlayer{}
 	for r, row := range sheet.Data[0].RowData {
 		if r == matchsRow {
 			matchCount = extractMatchCount(row)
@@ -82,15 +82,15 @@ func extractTeamPlayers(sheet *sheets.Sheet, teamID string) ([]*api.Player, erro
 	return players, nil
 }
 
-func extractPlayers(tabs []*sheets.Sheet, jobs uint, team string) ([]*api.Player, error) {
+func extractPlayers(tabs []*sheets.Sheet, jobs uint, team string) ([]*api.DbPlayer, error) {
 
 	if len(tabs) < 2 {
 		return nil, fmt.Errorf("Invalid sheet count")
 	}
 
-	players := []*api.Player{}
+	players := []*api.DbPlayer{}
 	pending := make(chan *sheets.Sheet)
-	results := make(chan []*api.Player)
+	results := make(chan []*api.DbPlayer)
 	stop := make(chan bool)
 	running := &sync.WaitGroup{}
 	running.Add(int(jobs))

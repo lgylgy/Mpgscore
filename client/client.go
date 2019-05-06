@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
-
 	"mpgscore/api"
+	"os"
 )
 
-func createPlayer(host string, input *api.Player) error {
-	output := &api.Player{}
+func createPlayer(host string, input *api.DbPlayer) error {
+	output := &api.DbPlayer{}
 	err := postJson(host, "/players", input, output)
 	if err != nil {
 		return err
@@ -21,8 +20,8 @@ func createPlayer(host string, input *api.Player) error {
 	return nil
 }
 
-func updatePlayer(host string, input *api.Player) error {
-	output := &api.Player{}
+func updatePlayer(host string, input *api.DbPlayer) error {
+	output := &api.DbPlayer{}
 	err := putJson(host, fmt.Sprintf("/players/%s", input.ID), input, output)
 	if err != nil {
 		return err
@@ -53,19 +52,19 @@ func main() {
 		log.Fatalf("Unable to read file: %v", err)
 	}
 
-	var updated []*api.Player
+	var updated []*api.DbPlayer
 	err = json.Unmarshal(data, &updated)
 	if err != nil {
 		log.Fatalf("Cannot parse players: %v", err)
 	}
 
-	result := &[]*api.Player{}
+	result := &[]*api.DbPlayer{}
 	err = getJson(*host, "/players", result)
 	if err != nil {
 		log.Fatalf("Cannot to fetch  players: %v", err)
 	}
 
-	actual := map[string]*api.Player{}
+	actual := map[string]*api.DbPlayer{}
 	for _, v := range *result {
 		actual[v.Name] = v
 	}

@@ -10,23 +10,7 @@ import (
 	"net/url"
 )
 
-type mPlayer struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-}
-
-type mData struct {
-	Players []*mPlayer `json:"players"`
-}
-
-type xPlayer struct {
-	ID     string   `json:"id"`
-	Name   string   `json:"name"`
-	Team   string   `json:"team"`
-	Grades []string `json:"grades"`
-}
-
-func getMyTeam(league, key string) ([]*mPlayer, error) {
+func getMyTeam(league, key string) ([]*api.MpgPlayer, error) {
 	client := &http.Client{}
 
 	url := fmt.Sprintf("$MYMPG", league, key)
@@ -46,7 +30,7 @@ func getMyTeam(league, key string) ([]*mPlayer, error) {
 		return nil, err
 	}
 
-	var info mData
+	var info api.MpgData
 	err = json.Unmarshal(body, &info.Players)
 	if err != nil {
 		return nil, err
@@ -54,7 +38,7 @@ func getMyTeam(league, key string) ([]*mPlayer, error) {
 	return info.Players, nil
 }
 
-func getMyPlayer(firstname, lastname string) (*xPlayer, error) {
+func getMyPlayer(firstname, lastname string) (*api.DbPlayer, error) {
 	client := &http.Client{}
 
 	adr := fmt.Sprintf("$MYPLAYER",
@@ -79,7 +63,7 @@ func getMyPlayer(firstname, lastname string) (*xPlayer, error) {
 		return nil, err
 	}
 
-	var info xPlayer
+	var info api.DbPlayer
 	err = json.Unmarshal(body, &info)
 	if err != nil {
 		return nil, err
@@ -87,14 +71,14 @@ func getMyPlayer(firstname, lastname string) (*xPlayer, error) {
 	return &info, nil
 }
 
-func getPlayers(league, key string) ([]*xPlayer, error) {
+func getPlayers(league, key string) ([]*api.DbPlayer, error) {
 
 	myTeam, err := getMyTeam(league, key)
 	if err != nil {
 		return nil, err
 	}
 
-	result := []*xPlayer{}
+	result := []*api.DbPlayer{}
 	for _, v := range myTeam {
 		player, err := getMyPlayer(api.NormalizeString(v.Firstname),
 			api.NormalizeString(v.Lastname))
