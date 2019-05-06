@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"net"
 
-	"fmt"
 	"github.com/rs/xid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
