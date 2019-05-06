@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"mpgscore/api"
 	"net/http"
 	"net/url"
 )
@@ -95,7 +96,8 @@ func getPlayers(league, key string) ([]*xPlayer, error) {
 
 	result := []*xPlayer{}
 	for _, v := range myTeam {
-		player, err := getMyPlayer(v.Firstname, v.Lastname)
+		player, err := getMyPlayer(api.NormalizeString(v.Firstname),
+			api.NormalizeString(v.Lastname))
 		if err != nil {
 			continue
 		}

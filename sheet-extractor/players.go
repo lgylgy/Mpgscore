@@ -34,10 +34,10 @@ func extractMatchCount(row *sheets.RowData) int {
 
 func extractPlayer(row *sheets.RowData, team string, matchs int) *api.Player {
 	player := &api.Player{}
-	player.Team = team
+	player.Team = api.NormalizeString(team)
 	for c, data := range row.Values {
 		if c == nameRow {
-			player.Name = data.FormattedValue
+			player.Name = api.NormalizeString(data.FormattedValue)
 		} else if c >= matchsCols && c < matchsCols+matchs {
 			player.Grades = append(player.Grades, data.FormattedValue)
 		}
