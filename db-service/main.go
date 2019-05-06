@@ -3,10 +3,13 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"mpgscore/api"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 type Player struct {
@@ -19,18 +22,26 @@ type Player struct {
 var controller *Controller
 
 func main() {
+	key := os.Getenv("MPGDB")
+	if len(key) == 0 {
+		log.Fatal("$MPGDB variable is not present")
+	}
+	port, err := strconv.Atoi(key)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	controller = NewController()
-	err := controller.Connect("$MONGODB", "$MONGODB", "$MONGODB")
+	err = controller.Connect("$MONGODB", "$MONGODB", "$MONGODB")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer controller.Close()
 
-	registerHandlers()
+	registerHandlers(port)
 }
 
-func registerHandlers() {
+func registerHandlers(port int) {
 	routes := mux.NewRouter()
 	routes.Handle("/", http.RedirectHandler("/players", http.StatusFound))
 	routes.Methods("GET").Path("/players").
@@ -46,7 +57,7 @@ func registerHandlers() {
 	routes.Methods("POST").Path("/players").
 		Handler(api.Handler(createPlayer))
 
-	log.Fatal(http.ListenAndServe(":8080", routes))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), routes))
 }
 
 func createPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *api.MpgError) {

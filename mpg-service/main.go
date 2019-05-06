@@ -2,10 +2,13 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"mpgscore/api"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 func main() {
@@ -13,12 +16,21 @@ func main() {
 }
 
 func registerHandlers() {
+	key := os.Getenv("PLAYERDB")
+	if len(key) == 0 {
+		log.Fatal("$PLAYERDB variable is not present")
+	}
+	port, err := strconv.Atoi(key)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	routes := mux.NewRouter()
 	routes.Handle("/", http.RedirectHandler("/mympg", http.StatusFound))
 	routes.Methods("GET").Path("/mympg").
 		Handler(api.Handler(myPlayers))
 
-	log.Fatal(http.ListenAndServe(":8080", routes))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), routes))
 }
 
 func myPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *api.MpgError) {
