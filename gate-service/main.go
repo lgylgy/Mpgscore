@@ -11,18 +11,29 @@ import (
 	"strconv"
 )
 
+var mpgPort int = retrievePort("PLAYERDB")
+var dbPort int = retrievePort("MPGDB")
+
 func main() {
 	registerHandlers()
 }
 
-func registerHandlers() {
-	key := os.Getenv("GATEDB")
+func retrievePort(value string) int {
+	key := os.Getenv(value)
 	if len(key) == 0 {
-		log.Fatal("$GATEDB variable is not present")
+		return 0
 	}
 	port, err := strconv.Atoi(key)
 	if err != nil {
-		log.Fatal(err)
+		return 0
+	}
+	return port
+}
+
+func registerHandlers() {
+	port := retrievePort("GATEDB")
+	if port == 0 {
+		log.Fatal("$GATEDB variable is not present")
 	}
 
 	routes := mux.NewRouter()
