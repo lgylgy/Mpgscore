@@ -89,7 +89,9 @@ func (c *Controller) GetPlayerById(id string) (*Player, error) {
 
 func (c *Controller) GetPlayer(firstname, lastname string) (*Player, error) {
 	player := &Player{}
-	if err := c.collection.Find(bson.D{{Name: "name", Value: fmt.Sprintf("%s %s", lastname, firstname)}}).One(player); err != nil {
+	regex := "(?=.*" + lastname + ")(?=.*" + firstname + ")"
+	err := c.collection.Find(bson.M{"name": bson.M{"$regex": bson.RegEx{regex, ""}}}).One(player)
+	if err != nil {
 		return nil, err
 	}
 	return player, nil
