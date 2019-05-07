@@ -13,7 +13,7 @@ import (
 func getMyTeam(league, key string) ([]*api.MpgPlayer, error) {
 	client := &http.Client{}
 
-	url := fmt.Sprintf("http://localhost:%d?league=%s&key=%s", mpgPort, league, key)
+	url := fmt.Sprintf("http://localhost:%d/mympg?league=%s&key=%s", mpgPort, league, key)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func getMyTeam(league, key string) ([]*api.MpgPlayer, error) {
 func getMyPlayer(firstname, lastname string) (*api.DbPlayer, error) {
 	client := &http.Client{}
 
-	url := fmt.Sprintf("http://localhost:%d?firstname=%s&lastname=%s",
+	url := fmt.Sprintf("http://localhost:%d/player?firstname=%s&lastname=%s",
 		dbPort, url.QueryEscape(firstname), url.QueryEscape(lastname))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
