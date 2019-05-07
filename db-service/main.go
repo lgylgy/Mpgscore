@@ -12,13 +12,6 @@ import (
 	"strconv"
 )
 
-type Player struct {
-	ID     string   `json:"id"`
-	Name   string   `json:"name"`
-	Team   string   `json:"team"`
-	Grades []string `json:"grades"`
-}
-
 var controller *Controller
 
 func main() {
@@ -63,7 +56,7 @@ func registerHandlers(port int) {
 func createPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *api.MpgError) {
 	defer r.Body.Close()
 
-	var player Player
+	var player api.DbPlayer
 	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
 		return nil, api.MpgErrorf("POST /players", err)
 	}
@@ -115,7 +108,7 @@ func getPlayer(w http.ResponseWriter, r *http.Request) (interface{}, *api.MpgErr
 }
 
 func updatePlayer(w http.ResponseWriter, r *http.Request) (interface{}, *api.MpgError) {
-	var player Player
+	var player api.DbPlayer
 	if err := json.NewDecoder(r.Body).Decode(&player); err != nil {
 		return nil, api.MpgErrorf("PUT /players", err)
 	}
