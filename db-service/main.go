@@ -24,12 +24,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	mongoDB := os.Getenv("MONGODB")
+	if len(mongoDB) == 0 {
+		log.Fatal("$MONGODB variable is not present")
+	}
+
 	controller = NewController()
-	err = controller.Connect("$MONGODB", "$MONGODB", "$MONGODB")
+	err = controller.Connect(mongoDB, "mpg", "mpg", false)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer controller.Close()
+	log.Println("Connection MongoDB succeed!")
 
 	registerHandlers(port)
 }
