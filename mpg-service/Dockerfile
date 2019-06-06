@@ -17,7 +17,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o mpg-service .
 
 RUN chmod +x mpg-service
 
-ENV PLAYERDB=3052
+ENV PORT=3052
+ENV ROUTE=teams
+ENV DB=<api>
 
 EXPOSE 3052
 

@@ -12,14 +12,31 @@ import (
 	api "github.com/lgylgy/mpgscore/api"
 )
 
+var (
+	route  = ""
+	dbAddr = ""
+)
+
 func main() {
 	registerHandlers()
 }
 
 func registerHandlers() {
-	key := os.Getenv("PLAYERDB")
+	dbAddr = os.Getenv("DB")
+	if len(dbAddr) == 0 {
+		log.Fatal("$DB variable is not present")
+	}
+	log.Printf("db: %v\n", dbAddr)
+
+	route = os.Getenv("ROUTE")
+	if len(route) == 0 {
+		log.Fatal("$ROUTE variable is not present")
+	}
+	log.Printf("route: %v\n", route)
+
+	key := os.Getenv("PORT")
 	if len(key) == 0 {
-		log.Fatal("$PLAYERDB variable is not present")
+		log.Fatal("$PORT variable is not present")
 	}
 	port, err := strconv.Atoi(key)
 	if err != nil {
@@ -45,7 +62,7 @@ func myPlayers(w http.ResponseWriter, r *http.Request) (interface{}, *api.MpgErr
 	if key == "" {
 		return nil, api.MpgErrorf("/mympg", errors.New("missing parameter"))
 	}
-	result, err := getPlayers(league, key)
+	result, err := getPlayers(league, key, dbAddr, route)
 	if err != nil {
 		return nil, api.MpgErrorf("/mympg", err)
 	}

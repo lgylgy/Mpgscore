@@ -13,10 +13,20 @@ type PlayersInfo struct {
 	Data *api.MpgData `json:"data"`
 }
 
-func getPlayers(league, key string) ([]*api.MpgPlayer, error) {
+type TeamData struct {
+	Id      string           `json:"id"`
+	Players []*api.MpgPlayer `json:"players"`
+}
+
+type TeamsInfo struct {
+	CurrentTeam string               `json:"current_mpg_team"`
+	Teams       map[string]*TeamData `json:"teams"`
+}
+
+func getPlayers(league, key, remote, route string) ([]*api.MpgPlayer, error) {
 	client := &http.Client{}
 
-	url := fmt.Sprintf("https://api.monpetitgazon.com/league/%s/coach", league)
+	url := fmt.Sprintf("https://%s/%s/%s", remote, league, route)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -34,13 +44,34 @@ func getPlayers(league, key string) ([]*api.MpgPlayer, error) {
 		return nil, err
 	}
 
+	if route == "coach" {
+		return getCoachPlayers(body)
+	}
+	return getTeamsPlayers(body)
+}
+
+func getCoachPlayers(body []byte) ([]*api.MpgPlayer, error) {
 	var info PlayersInfo
-	err = json.Unmarshal(body, &info)
+	err := json.Unmarshal(body, &info)
 	if err != nil {
 		return nil, err
 	}
 	if info.Data != nil {
 		return info.Data.Players, nil
+	}
+	return []*api.MpgPlayer{}, nil
+}
+
+func getTeamsPlayers(body []byte) ([]*api.MpgPlayer, error) {
+	var info TeamsInfo
+	err := json.Unmarshal(body, &info)
+	if err != nil {
+		return nil, err
+	}
+	for k, v := range info.Teams {
+		if k == info.CurrentTeam {
+			return v.Players, nil
+		}
 	}
 	return []*api.MpgPlayer{}, nil
 }
