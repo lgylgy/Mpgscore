@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mpg-service
+  labels:
+    app: mpg-service
+    component: service
+    version: "1.0"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mpg-service
+      component: service
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: mpg-service
+        component: service
+        version: "1.0"
+    spec:
+      containers:
+      - name: mpg-service
+        image: registry.hub.docker.com/lgylgy/mpg-service:1.0
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "3052"
+        - name: ROUTE
+          value: "teams"
+        - name: DB
+          value: "api.monpetitgazon.com/league"
+        ports:
+        - containerPort: 3052

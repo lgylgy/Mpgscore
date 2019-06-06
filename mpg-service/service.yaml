@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mpg-service
+  labels:
+    app: mpg-service
+    component: service
+    version: "1.0"
+spec:
+  ports:
+  - name: http
+    port: 3052
+  selector:
+    app: mpg-service
+    component: service
+    version: "1.0"
