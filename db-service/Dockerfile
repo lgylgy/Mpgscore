@@ -19,7 +19,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o db-service .
 
 RUN chmod +x db-service
 
-ENV MPGDB=3051
+ENV PORT=3051
 
 EXPOSE 3051
 

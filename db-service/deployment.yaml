@@ -27,7 +27,7 @@ spec:
         image: registry.hub.docker.com/lgylgy/db-service:1.0
         imagePullPolicy: Always
         env:
-        - name: MPGDB
+        - name: PORT
           value: "3051"
         - name: TLS
           value: "true"

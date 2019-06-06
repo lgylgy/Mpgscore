@@ -16,7 +16,7 @@ import (
 var controller *Controller
 
 func main() {
-	key := api.GetEnv("MPGDB")
+	key := api.GetEnv("PORT")
 	port, err := strconv.Atoi(key)
 	if err != nil {
 		log.Fatal(err)

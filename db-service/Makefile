@@ -1,5 +1,20 @@
+VERSION=1.0
+HUB=lgylgy
+NAME=db-service
+SERVICE=$(HUB)/$(NAME):$(VERSION)
+
 build:
-	docker build -t db-service .
+	docker build -t $(SERVICE) . --no-cache
 
 run:
-	docker run --rm -p 8080:8080 db-service
+	docker run -p 3051:3051 --rm $(SERVICE)
+
+remove:
+	docker rmi $(SERVICE)
+
+push:
+	docker push $(SERVICE)
+
+deploy:
+	kubectl apply -f deployment.yaml
+	kubectl apply -f service.yaml
