@@ -5,8 +5,9 @@ import (
 	"github.com/rs/xid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"mpgscore/api"
 	"net"
+
+	api "github.com/lgylgy/mpgscore/api"
 )
 
 type Controller struct {
@@ -18,12 +19,12 @@ func NewController() *Controller {
 	return &Controller{}
 }
 
-func (c *Controller) Connect(mongoAddr, database, collection string, tcp bool) error {
+func (c *Controller) Connect(mongoAddr, database, collection string, tlsOption bool) error {
 	dialInfo, err := mgo.ParseURL(mongoAddr)
 	if err != nil {
 		return err
 	}
-	if tcp {
+	if tlsOption {
 		tlsConfig := &tls.Config{}
 		dialInfo.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
 			conn, err := tls.Dial("tcp", addr.String(), tlsConfig)

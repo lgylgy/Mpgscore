@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
-	"mpgscore/api"
 	"net/http"
 	"os"
 	"strconv"
+
+	api "github.com/lgylgy/mpgscore/api"
 )
 
 var controller *Controller
@@ -23,14 +24,23 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("port: %v\n", port)
 
 	mongoDB := os.Getenv("MONGODB")
 	if len(mongoDB) == 0 {
 		log.Fatal("$MONGODB variable is not present")
 	}
+	log.Printf("mongo: %v\n", mongoDB)
+
+	tlsOption := true
+	tlsEnv := os.Getenv("TLS")
+	if len(tlsEnv) == 0 || tlsEnv != "true" {
+		tlsOption = false
+	}
+	log.Printf("tls: %v\n", tlsOption)
 
 	controller = NewController()
-	err = controller.Connect(mongoDB, "mpg", "mpg", false)
+	err = controller.Connect(mongoDB, "mpg", "mpg", tlsOption)
 	if err != nil {
 		log.Fatal(err)
 	}
