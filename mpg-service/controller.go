@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"mpgscore/api"
 	"net/http"
+
+	api "github.com/lgylgy/mpgscore/api"
 )
 
 type PlayersInfo struct {

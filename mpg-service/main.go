@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
-	"mpgscore/api"
 	"net/http"
 	"os"
 	"strconv"
+
+	api "github.com/lgylgy/mpgscore/api"
 )
 
 func main() {
@@ -24,6 +25,7 @@ func registerHandlers() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("port: %v\n", port)
 
 	routes := mux.NewRouter()
 	routes.Handle("/", http.RedirectHandler("/mympg", http.StatusFound))
