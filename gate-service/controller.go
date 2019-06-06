@@ -5,15 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"mpgscore/api"
 	"net/http"
 	"net/url"
+
+	api "github.com/lgylgy/mpgscore/api"
 )
 
 func getMyTeam(league, key string) ([]*api.MpgPlayer, error) {
 	client := &http.Client{}
 
-	url := fmt.Sprintf("http://localhost:%d/mympg?league=%s&key=%s", mpgPort, league, key)
+	url := fmt.Sprintf("http://%s/mympg?league=%s&key=%s", mpgAddr, league, key)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -41,8 +42,8 @@ func getMyTeam(league, key string) ([]*api.MpgPlayer, error) {
 func getMyPlayer(firstname, lastname string) (*api.DbPlayer, error) {
 	client := &http.Client{}
 
-	url := fmt.Sprintf("http://localhost:%d/player?firstname=%s&lastname=%s",
-		dbPort, url.QueryEscape(firstname), url.QueryEscape(lastname))
+	url := fmt.Sprintf("http://%s/player?firstname=%s&lastname=%s",
+		dbAddr, url.QueryEscape(firstname), url.QueryEscape(lastname))
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

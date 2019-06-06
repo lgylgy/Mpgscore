@@ -5,36 +5,30 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
-	"mpgscore/api"
 	"net/http"
-	"os"
 	"strconv"
+
+	api "github.com/lgylgy/mpgscore/api"
 )
 
-var mpgPort int = retrievePort("PLAYERDB")
-var dbPort int = retrievePort("MPGDB")
+var (
+	mpgAddr = ""
+	dbAddr  = ""
+)
 
 func main() {
 	registerHandlers()
 }
 
-func retrievePort(value string) int {
-	key := os.Getenv(value)
-	if len(key) == 0 {
-		return 0
-	}
+func registerHandlers() {
+	key := api.GetEnv("PORT")
 	port, err := strconv.Atoi(key)
 	if err != nil {
-		return 0
+		log.Fatal(err)
 	}
-	return port
-}
 
-func registerHandlers() {
-	port := retrievePort("GATEDB")
-	if port == 0 {
-		log.Fatal("$GATEDB variable is not present")
-	}
+	mpgAddr = api.GetEnv("MPG_SERVICE_ADDR")
+	dbAddr = api.GetEnv("DB_SERVICE_ADDR")
 
 	routes := mux.NewRouter()
 	routes.Handle("/", http.RedirectHandler("/mpg", http.StatusFound))
