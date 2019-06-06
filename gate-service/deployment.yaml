@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gate-service
+  labels:
+    app: gate-service
+    component: service
+    version: "1.0"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: gate-service
+      component: service
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: gate-service
+        component: service
+        version: "1.0"
+    spec:
+      containers:
+      - name: gate-service
+        image: registry.hub.docker.com/lgylgy/gate-service:1.0
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "3053"
+        - name: MPG_SERVICE_ADDR
+          value: "mpg-service:3052"
+        - name: DB_SERVICE_ADDR
+          value: "db-service:3051"
+        ports:
+        - containerPort: 3053

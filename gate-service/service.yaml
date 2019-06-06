@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gate-service
+  labels:
+    app: gate-service
+    component: service
+    version: "1.0"
+spec:
+  ports:
+  - name: http
+    port: 3053
+  selector:
+    app: gate-service
+    component: service
+    version: "1.0"
