@@ -7,7 +7,7 @@ build:
 	docker build -t $(SERVICE) . --no-cache
 
 run:
-	docker run -p 3051:3051 --rm $(SERVICE)
+	docker run -p 3052:3052 --rm $(SERVICE)
 
 remove:
 	docker rmi $(SERVICE)
