@@ -1,11 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: players
+  name: db-service
+  labels:
+    app: db-service
+    component: service
+    version: "1.0"
 spec:
   ports:
-    - port: 80
-      targetPort: 80
-      protocol: TCP
+  - name: http
+    port: 3051
   selector:
-    name: players
+    app: db-service
+    component: service
+    version: "1.0"

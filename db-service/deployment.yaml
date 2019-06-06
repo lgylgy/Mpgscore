@@ -1,21 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: players-deployment
+  name: db-service
+  labels:
+    app: db-service
+    component: service
+    version: "1.0"
 spec:
+  replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
-      app: players
-  replicas: 1
+      app: db-service
+      component: service
+      version: "1.0"
   template:
     metadata:
       labels:
-        app: players
+        app: db-service
+        component: service
+        version: "1.0"
     spec:
       containers:
-      - image: gcr.io/mpgdb-217111/db-service:1.0
-        name: players-container
+      - name: db-service
+        image: registry.hub.docker.com/lgylgy/db-service:1.0
         imagePullPolicy: Always
+        env:
+        - name: MPGDB
+          value: "3051"
+        - name: TLS
+          value: "true"
+        - name: MONGODB
+          value: "mongodb://<user>:<password>@cluster0-shard-00-00-2hji4.gcp.mongodb.net:27017,cluster0-shard-00-01-2hji4.gcp.mongodb.net:27017,cluster0-shard-00-02-2hji4.gcp.mongodb.net:27017"
         ports:
-        - containerPort: 8080
-          name: http-server
+        - containerPort: 3051
