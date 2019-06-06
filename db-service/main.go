@@ -16,22 +16,13 @@ import (
 var controller *Controller
 
 func main() {
-	key := os.Getenv("MPGDB")
-	if len(key) == 0 {
-		log.Fatal("$MPGDB variable is not present")
-	}
+	key := api.GetEnv("MPGDB")
 	port, err := strconv.Atoi(key)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("port: %v\n", port)
 
-	mongoDB := os.Getenv("MONGODB")
-	if len(mongoDB) == 0 {
-		log.Fatal("$MONGODB variable is not present")
-	}
-	log.Printf("mongo: %v\n", mongoDB)
-
+	mongoDB := api.GetEnv("MONGODB")
 	tlsOption := true
 	tlsEnv := os.Getenv("TLS")
 	if len(tlsEnv) == 0 || tlsEnv != "true" {

@@ -1,11 +1,12 @@
 package api
 
 import (
-	"strings"
-	"unicode"
-
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
+	"log"
+	"os"
+	"strings"
+	"unicode"
 )
 
 func NormalizeString(value string) string {
@@ -19,4 +20,13 @@ func NormalizeString(value string) string {
 		return strings.TrimSpace(value)
 	}
 	return strings.TrimSpace(result)
+}
+
+func GetEnv(key string) string {
+	value := os.Getenv(key)
+	if len(value) == 0 {
+		log.Fatal("%v variable is not present", key)
+	}
+	log.Printf("%v: %v\n", key, value)
+	return value
 }

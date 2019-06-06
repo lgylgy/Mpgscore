@@ -6,7 +6,6 @@ import (
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	api "github.com/lgylgy/mpgscore/api"
@@ -22,27 +21,13 @@ func main() {
 }
 
 func registerHandlers() {
-	dbAddr = os.Getenv("DB")
-	if len(dbAddr) == 0 {
-		log.Fatal("$DB variable is not present")
-	}
-	log.Printf("db: %v\n", dbAddr)
-
-	route = os.Getenv("ROUTE")
-	if len(route) == 0 {
-		log.Fatal("$ROUTE variable is not present")
-	}
-	log.Printf("route: %v\n", route)
-
-	key := os.Getenv("PORT")
-	if len(key) == 0 {
-		log.Fatal("$PORT variable is not present")
-	}
+	dbAddr = api.GetEnv("DB")
+	route = api.GetEnv("ROUTE")
+	key := api.GetEnv("PORT")
 	port, err := strconv.Atoi(key)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("port: %v\n", port)
 
 	routes := mux.NewRouter()
 	routes.Handle("/", http.RedirectHandler("/mympg", http.StatusFound))
