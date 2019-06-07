@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-service
+  labels:
+    app: front-service
+    component: service
+    version: "1.0"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: front-service
+      component: service
+      version: "1.0"
+  template:
+    metadata:
+      labels:
+        app: front-service
+        component: service
+        version: "1.0"
+    spec:
+      containers:
+      - name: front-service
+        image: registry.hub.docker.com/lgylgy/front-service:1.0
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "3054"
+        - name: GATE_SERVICE_ADDR
+          value: "gate-service:3053"
+        ports:
+        - containerPort: 3054

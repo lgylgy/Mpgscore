@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-service
+  labels:
+    app: front-service
+    component: service
+    version: "1.0"
+spec:
+  ports:
+  - name: http
+    port: 3054
+  selector:
+    app: front-service
+    component: service
+    version: "1.0"
