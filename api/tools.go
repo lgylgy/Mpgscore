@@ -25,7 +25,7 @@ func NormalizeString(value string) string {
 func GetEnv(key string) string {
 	value := os.Getenv(key)
 	if len(value) == 0 {
-		log.Fatal("%v variable is not present", key)
+		log.Fatalf("%v variable is not present", key)
 	}
 	log.Printf("%v: %v\n", key, value)
 	return value

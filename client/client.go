@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/lgylgy/mpgscore/api"
 	"io/ioutil"
 	"log"
-	"mpgscore/api"
 	"os"
 )
 

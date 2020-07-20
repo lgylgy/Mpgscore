@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/lgylgy/mpgscore/api"
 	"google.golang.org/api/sheets/v4"
-	"mpgscore/api"
 )
 
 const (
