@@ -9,10 +9,7 @@ import (
 )
 
 const (
-	startingSheet  = 1
 	startingPlayer = 7
-	teamCol        = 0
-	teamRow        = 0
 	matchsRow      = 6
 	matchsCols     = 7
 	nameRow        = 2

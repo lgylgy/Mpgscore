@@ -1,6 +1,7 @@
 package api
 
 import (
+	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
 	"log"
@@ -11,10 +12,7 @@ import (
 
 func NormalizeString(value string) string {
 	value = strings.ToLower(value)
-	isMn := func(r rune) bool {
-		return unicode.Is(unicode.Mn, r)
-	}
-	t := transform.Chain(norm.NFD, transform.RemoveFunc(isMn), norm.NFC)
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	result, _, err := transform.String(t, value)
 	if err != nil {
 		return strings.TrimSpace(value)

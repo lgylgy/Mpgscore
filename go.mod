@@ -7,6 +7,7 @@ require (
 	github.com/gorilla/mux v1.7.2
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/rs/xid v1.2.1
+	github.com/stretchr/testify v1.6.1
 	go.opencensus.io v0.22.0 // indirect
 	golang.org/x/net v0.0.0-20190603091049-60506f45cf65
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45

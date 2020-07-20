@@ -91,7 +91,9 @@ func (c *Controller) GetPlayerById(id string) (*api.DbPlayer, error) {
 func (c *Controller) GetPlayer(firstname, lastname string) (*api.DbPlayer, error) {
 	player := &api.DbPlayer{}
 	regex := "(?=.*" + lastname + ")(?=.*" + firstname + ")"
-	err := c.collection.Find(bson.M{"name": bson.M{"$regex": bson.RegEx{regex, ""}}}).One(player)
+	err := c.collection.Find(bson.M{"name": bson.M{"$regex": bson.RegEx{
+		Pattern: regex,
+		Options: ""}}}).One(player)
 	if err != nil {
 		return nil, err
 	}

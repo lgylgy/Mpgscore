@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,7 +27,7 @@ func do(verb, host, path, contentType string, input []byte,
 	var body io.Reader = rsp.Body
 
 	if rsp.StatusCode != http.StatusOK {
-		return errors.New(fmt.Sprintf("Error: %v status code: %v", u, rsp.StatusCode))
+		return fmt.Errorf("Error: %v status code: %v", u, rsp.StatusCode)
 	}
 	if decode == nil {
 		return nil

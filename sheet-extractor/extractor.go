@@ -48,10 +48,10 @@ func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 // Retrieves a token from a local file.
 func tokenFromFile(file string) (*oauth2.Token, error) {
 	f, err := os.Open(file)
-	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	tok := &oauth2.Token{}
 	err = json.NewDecoder(f).Decode(tok)
 	return tok, err
@@ -61,11 +61,14 @@ func tokenFromFile(file string) (*oauth2.Token, error) {
 func saveToken(path string, token *oauth2.Token) {
 	fmt.Printf("Saving credential file to: %s\n", path)
 	f, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
-	defer f.Close()
 	if err != nil {
 		log.Fatalf("Unable to cache oauth token: %v", err)
 	}
-	json.NewEncoder(f).Encode(token)
+	defer f.Close()
+	err = json.NewEncoder(f).Encode(token)
+	if err != nil {
+		log.Fatalf("Unable to encode oauth token: %v", err)
+	}
 }
 
 func main() {
